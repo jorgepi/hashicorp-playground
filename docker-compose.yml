@@ -1,0 +1,45 @@
+version: '3'
+services:
+    consul:
+        container_name: consul
+        image: consul:latest
+        networks: 
+            - hashicorp-playground
+        restart: always
+        ports:
+            - "8300:8300"
+            - "8500:8500"
+        volumes:
+            - ./data/consul:/data
+        command: "agent -server -bootstrap-expect 1 -ui -client 0.0.0.0"
+    registrator:
+        container_name: registrator
+        image: gliderlabs/registrator:latest
+        depends_on:
+            - consul
+        networks:
+            - hashicorp-playground
+        restart: always
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock
+        command: "consul://consul:8500"
+    vault:
+        container_name: vault
+        image: vault:latest
+        depends_on:
+            - consul
+            - registrator
+        networks:
+            - hashicorp-playground
+        restart: always
+        environment:
+            - VAULT_ADDR=http://127.0.0.1:8200
+        ports:
+            - 8200:8200
+        volumes:
+            - ./configfiles:/configfiles
+        cap_add:
+            - IPC_LOCK
+        command: server -config=/configfiles/vault.hcl
+networks:
+    hashicorp-playground:
