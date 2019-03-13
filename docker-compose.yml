@@ -37,9 +37,20 @@ services:
         ports:
             - 8200:8200
         volumes:
-            - ./configfiles:/configfiles
+            - ./configfiles/vault:/configfiles
         cap_add:
             - IPC_LOCK
         command: server -config=/configfiles/vault.hcl
+    jenkins:
+        container_name: jenkins
+        image: jenkins/jenkins:lts
+        depends_on:
+            - vault
+        networks:
+            - hashicorp-playground
+        restart: always
+        ports:
+            - 8080:8080
+            - 50000:50000
 networks:
     hashicorp-playground:
