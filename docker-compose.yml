@@ -43,16 +43,18 @@ services:
         command: server -config=/configfiles/vault.hcl
     jenkins:
         container_name: jenkins
-        image: jenkins/jenkins:lts
+        image: jorgepi/jenkins-docker:latest
         depends_on:
             - vault
         networks:
             - hashicorp-playground
         restart: always
+        user: root
         ports:
             - 8080:8080
             - 50000:50000
         volumes:
             - ./data/jenkins:/var/jenkins_home
+            - /var/run/docker.sock:/var/run/docker.sock
 networks:
     hashicorp-playground:
