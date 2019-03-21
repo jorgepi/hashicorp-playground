@@ -1,4 +1,4 @@
-pipeline {
+node {
     def secrets = [
         [$class: 'VaultSecret', path: 'secret/nodejs', secretValues: [
             [$class: 'VaultSecretValue', envVar: 'secret', vaultKey: 'password']
